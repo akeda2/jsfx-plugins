@@ -1,0 +1,20 @@
+desc: spacelab test tone generator
+
+slider1:1000<20,20000>frequency (hz)
+slider2:-12<-60,0>amplitude (db)
+
+@init
+step=1/srate;
+t=0;
+
+@slider
+two_pi_freq = 2 * $pi * slider1;
+gain = 10^(slider2/20);
+
+@block
+t > 10000 ? t -= 10000;
+
+@sample
+spl0 = spl1 = sin( two_pi_freq * t ) * gain;
+t += step;
+
