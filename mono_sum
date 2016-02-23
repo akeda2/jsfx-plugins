@@ -1,0 +1,9 @@
+desc:Mono - sum without negative gain
+
+
+@sample
+tmp0=(spl0+spl1);
+
+spl0=tmp0;
+spl1=tmp0;
+
