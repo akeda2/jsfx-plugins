@@ -1,0 +1,74 @@
+desc:Tejp, tape-noise, saturation and HF-loss simulator.
+//tags: tape noise saturation lowpass highcut
+//author: akeda
+//import Wuff/st-oversampler.jsfx-inc
+import cookdsp.jsfx-inc
+
+slider1:0<0,100,1>Saturation
+slider2:-32<-96,0,1>Noise (dB)
+slider4:13500<8000,18000,100>HF-loss/lowpass (Hz)
+slider5:-1<-120,0,1>Output pad (dB)
+//slider6:0.1<0,10,0.001>Flutter modulation frequency (Hz)
+//slider7:0.5<0,4,0.01>Flutter amount (%)
+
+@init
+
+AMP_DB = 20.0 / log(10);
+a=q=p=1;
+filt1.butlp(slider4);
+filt2.butlp(slider4);
+
+f1.eq(3000, 0.1, -12, 0);
+f2.eq(3000, 0.1, -12, 0);
+f3.eq(10000, 0.5, -8, 2);
+f3b.eq(10000, 0.5, -8, 2);
+f4.eq(1000, 0.5, 6, 1);
+f4b.eq(1000, 0.5, 6, 1);
+
+//dc_block
+//itm1=itm2=otm1=otm2=0;
+
+@slider
+
+//Noise-generator
+foo=slider1/200*$pi;
+bar = sin(slider1/200*$pi);
+noise_level = exp(slider2 / AMP_DB);
+
+pad=10^(slider5/20);
+
+//Lowpass-filter
+filt1.butlp_set_freq(slider4);
+filt2.butlp_set_freq(slider4);
+
+@sample
+
+q=sin((a+=1)*q);
+p=sin((a+=1)*p);
+
+
+//dc_block
+//otm1=0.999*otm1 + spl0 - itm1; itm1=spl0; spl0=otm1;
+//otm2=0.999*otm2 + spl1 - itm2; itm2=spl1; spl1=otm2;
+
+spl0 = filt1.butlp_do(spl0);
+spl1 = filt2.butlp_do(spl1);
+
+q = f1.eq_do(q);
+p = f2.eq_do(p);
+q = f3.eq_do(q);
+p = f3b.eq_do(p);
+q = f4.eq_do(q);
+p = f4b.eq_do(p);
+
+spl0 +=(q*noise_level);
+spl1 +=(p*noise_level);
+
+slider1 ? (
+spl0 = min(max( sin(max(min(spl0,1),-1)*foo)/bar ,-1) ,1);
+spl1 = min(max( sin(max(min(spl1,1),-1)*foo)/bar ,-1) ,1);
+);
+
+//Output-pad
+spl0 *= pad;
+spl1 *= pad;

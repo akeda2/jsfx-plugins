@@ -1,5 +1,6 @@
 desc:Mono - sum without negative gain
-
+//tags: mono downmix sum
+//author: akeda
 
 @sample
 tmp0=(spl0+spl1);
