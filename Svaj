@@ -7,8 +7,8 @@ desc: Tape wow/flutter
 slider1:250<0,500,1>Delay (ms)
 slider2:100<0,100,1>Mix (%)
 slider3:0<0,80,1>Feedback (%)
-slider4:0.1<0,10,0.001>Warp Rate (Hz)
-slider5:0.05<0,2,0.01>Warp Amount (%)
+slider4:5.4<0,10,0.001>Warp Rate (Hz)
+slider5:0.1<0,2,0.01>Warp Amount (%)
 slider6:100<0,100,1>Filter Cutoff (%)
 slider7:0<0,150,1>Filter Resonance (%)
 slider8:1<-2,2,0.5>Playback Rate
