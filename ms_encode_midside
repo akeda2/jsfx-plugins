@@ -1,4 +1,6 @@
-desc:ms midside encoder, akeda
+desc: MS midside sum/diff encoder
+//tags: ms sum/difference encoder
+//author: akeda
 
 @sample
 L = spl0;
