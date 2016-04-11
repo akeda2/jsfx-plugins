@@ -1,0 +1,7 @@
+desc:ms midside encoder, akeda
+
+@sample
+L = spl0;
+R = spl1;
+spl0 = (L+R) * 0.5;
+spl1 = (L-R) * 0.5;
