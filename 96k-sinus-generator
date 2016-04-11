@@ -1,6 +1,6 @@
 desc: Up to 96kHz sine generator, mainly for ultrasonic sweeps.
 
-slider1:1000<1,96000,1>Frequency (hz - linear)
+slider1:1000<1,96000,1.0>Frequency (hz - linear)
 slider2:-12<-144,0,1>Amplitude (db)
 
 @init
