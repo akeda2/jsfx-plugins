@@ -1,0 +1,92 @@
+desc:Variable RIAA-filter
+
+import cookdsp.jsfx-inc
+import wuff/st-oversampler.jsfx-inc
+
+slider1:500<200,1000,1>Low turnover (Hz)
+slider2:17<0,36,0.5>Bass boost (dB)
+slider3:2122<1600,6360,1>Midrange turnover (Hz)
+slider4:8000<4000,20000,1>12dB/oct High-cut (Hz)
+slider5:0<0,1,1{on,off}>High-cut on/off:
+slider6:0<-60,18,0.5>HF-scratch notch filter (dB)
+slider7:10000<4000,15000,1>HF-scratch filter frequency (dB)
+//slider8:1<0,1,1{on,off}>HF (scrap) notch on/off:
+slider9:25<15,100,1>12dB/oct Rumble filter frequency (Hz)
+slider10:0<0,1,1{on, off}>Rumble filter
+
+
+@init
+bpos=0;
+//dc_remove
+itm1=itm2=otm1=otm2=0;
+
+//Midrange-turnover
+LM.lop(slider3);
+RM.lop(slider3);
+//High-cut
+LHc.butlp(slider4);
+RHc.butlp(slider4);
+//Low-turnover
+LL.lop(slider1/10);
+LR.lop(slider1/10);
+//HF-scrap
+LS.eq(slider7,10,slider6,0);
+RS.eq(slider7,10,slider6,0);
+//Rumble
+LR.buthp(slider9);
+RR.buthp(slider9);
+
+
+@slider
+//MF-turnover
+LM.lop_set_freq(slider3);
+RM.lop_set_freq(slider3);
+//LF-boost
+LL.lop_set_freq(slider1/10);
+LR.lop_set_freq(slider1/10);
+gain=10^((slider2)/20);
+//HF-cut
+LHc.butlp_set_freq(slider4);
+RHc.butlp_set_freq(slider4);
+//HF-scrap
+LS.eq_set_freq(slider7);
+RS.eq_set_freq(slider7);
+LS.eq_set_boost(slider6);
+RS.eq_set_boost(slider6);
+//Rumble-filter
+LR.buthp_set_freq(slider9);
+RR.buthp_set_freq(slider9);
+
+@block
+blah+=samplesblock;
+
+@sample
+
+//Oversampling (dosn't work)
+//osL.os_up2(spl0);
+//spl1 = osR.os_up2(spl1);
+
+outLL = LL.lop_do(spl0)*gain;
+outLH = LHc.buthp_do(LM.lop_do(spl0)+outLL);
+
+outRL = LR.lop_do(spl1)*gain;
+outRH = RHc.buthp_do(RM.lop_do(spl1)+outRL);
+
+spl0=outLH;
+spl1=outRH;
+
+spl0 = LS.eq_do(spl0);
+spl1 = RS.eq_do(spl1);
+
+slider10 == 0 ? (
+spl0 = LR.buthp_do(spl0);
+spl1 = RR.buthp_do(spl1);
+);
+
+//spl0 = osL.os_down2();
+//spl1 = osR.os_down2();
+//dc_remove
+otm1=0.999*otm1 + spl0 - itm1; itm1=spl0; spl0=otm1;
+otm2=0.999*otm2 + spl1 - itm2; itm2=spl1; spl1=otm2;
+
+
