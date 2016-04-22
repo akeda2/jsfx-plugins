@@ -4,15 +4,17 @@ import cookdsp.jsfx-inc
 import wuff/st-oversampler.jsfx-inc
 
 slider1:500<200,1000,1>Low turnover (Hz)
-slider2:17<0,36,0.5>Bass boost (dB)
+slider2:24<0,36,0.5>Bass boost (dB)
 slider3:2122<1600,6360,1>Midrange turnover (Hz)
-slider4:8000<4000,20000,1>12dB/oct High-cut (Hz)
+slider4:15000<4000,20000,1>12dB/oct High-cut (Hz)
 slider5:0<0,1,1{on,off}>High-cut on/off:
-slider6:0<-60,18,0.5>HF-scratch notch filter (dB)
-slider7:10000<4000,15000,1>HF-scratch filter frequency (dB)
+slider6:0<-60,18,0.5>q10 HF-scratch notch filter (dB, neg or pos)
+slider7:10000<4000,15000,1>HF-scratch filter frequency (Hz)
 //slider8:1<0,1,1{on,off}>HF (scrap) notch on/off:
 slider9:25<15,100,1>12dB/oct Rumble filter frequency (Hz)
-slider10:0<0,1,1{on, off}>Rumble filter
+slider10:0<0,1,1{on,off}>Rumble filter
+slider11:0<0,2,1{stereo,mono(-6dB),mono}>Stereo/Mono
+slider12:0<0,1,1{on,off}>DC-filter
 
 
 @init
@@ -67,11 +69,10 @@ blah+=samplesblock;
 //spl1 = osR.os_up2(spl1);
 
 outLL = LL.lop_do(spl0)*gain;
-outLH = LHc.buthp_do(LM.lop_do(spl0)+outLL);
+slider5 == 0 ? (outLH = LHc.butlp_do(LM.lop_do(spl0)+outLL);):(outLH = LM.lop_do(spl0)+outLL;);
 
 outRL = LR.lop_do(spl1)*gain;
-outRH = RHc.buthp_do(RM.lop_do(spl1)+outRL);
-
+slider5 == 0 ? (outRH = RHc.butlp_do(RM.lop_do(spl1)+outRL);):(outRH = RM.lop_do(spl1)+outRL;);
 spl0=outLH;
 spl1=outRH;
 
@@ -83,10 +84,21 @@ spl0 = LR.buthp_do(spl0);
 spl1 = RR.buthp_do(spl1);
 );
 
-//spl0 = osL.os_down2();
-//spl1 = osR.os_down2();
+slider11 != 0 ? (
+ spl0 = spl1 = (spl0+spl1);
+  slider11 == 1 ? (
+   spl0*=0.5;
+   spl1*=0.5;
+   );
+ );
+
 //dc_remove
+slider12 == 0 ? (
 otm1=0.999*otm1 + spl0 - itm1; itm1=spl0; spl0=otm1;
 otm2=0.999*otm2 + spl1 - itm2; itm2=spl1; spl1=otm2;
+);
+
+//spl0 = osL.os_down2();
+//spl1 = osR.os_down2();
 
 
