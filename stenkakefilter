@@ -56,6 +56,8 @@ LL.lop_set_freq(slider1/10);
 LR.lop_set_freq(slider1/10);
 gain=10^((slider2)/20);
 //HF-cut
+LHcut.lop_set_freq(slider4);
+RHcut.lop_set_freq(slider4);
 LHc.butlp_set_freq(slider4);
 RHc.butlp_set_freq(slider4);
 //HF-scrap
