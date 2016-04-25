@@ -112,8 +112,10 @@ spl0=outLH;
 spl1=outRH;
 
 //HF-notch
-spl0 = LS.eq_do(spl0);
-spl1 = RS.eq_do(spl1);
+slider6 != 0 ? (
+ spl0 = LS.eq_do(spl0);
+ spl1 = RS.eq_do(spl1);
+);
 
 //Rumble-filter 2x12dB
 slider10 == 0 ? (
