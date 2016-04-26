@@ -1,4 +1,4 @@
-desc:Variable RIAA-filter
+Ldesc:Variable RIAA-filter
 
 import cookdsp.jsfx-inc
 //import wuff/st-oversampler.jsfx-inc
