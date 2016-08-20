@@ -4,9 +4,9 @@ import cookdsp.jsfx-inc
 
 slider1:80<60,140,0.5>Disco-hump (Hz)
 slider2:0<0,24,0.5>(dB)
-slider3:3500<2000,7000,1>Hängmatta/hammock midrange smiley-curve (Hz)
-slider4:0<-12,0,0.5>Hängmatta sag (dB)
-slider5:12000<8000,20000,1>Treble round-off (Hz)
+slider3:3500<2000,7000,1>Hammock/prescence midrange smiley-curve (Hz)
+slider4:0<-12,12,0.5>Hängmatta sag/boost (dB)
+slider5:20000<8000,20000,1>Treble round-off (Hz)
 //slider6:0<0,100,1>parameter5
 
 @init

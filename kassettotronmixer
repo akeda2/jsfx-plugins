@@ -1,0 +1,39 @@
+desc:Kassettotronmixer
+
+slider1:0<-90,6,0.1>vox1
+slider2:0<-90,6,0.1>vox2
+slider3:0<-90,6,0.1>vox3
+slider4:0<-90,6,0.1>granA
+slider5:0<-90,6,0.1>granB
+
+@init
+bpos=0;
+gain1=gain2=gain3=gain4=gain5=0;
+
+@slider
+something=slider1*srate;
+gain1 = 10^(slider1/20);
+gain2 = 10^(slider2/20);
+gain3 = 10^(slider3/20);
+gain4 = 10^(slider4/20);
+gain5 = 10^(slider5/20);
+
+@block
+blah+=samplesblock;
+
+@sample
+spl0= (
+(spl0*gain1)+
+(spl2*gain2)+
+(spl4*gain3)+
+(spl6*gain4)+
+(spl8*gain6));
+
+
+spl1= (
+(spl1*gain1)+
+(spl3*gain2)+
+(spl5*gain3)+
+(spl7*gain4)+
+(spl9*gain5));
+

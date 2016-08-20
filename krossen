@@ -3,6 +3,7 @@ desc: 2 stereo track mixer with crossfader
 slider1:0<-90,10,0.1>Track 1 (channel 1,2) (dB)
 slider2:0<-90,10,0.1>Track 2 (channel 3,4) (dB)
 slider3:0<-40,40,0.1>Crossfade
+slider4:0<-90,6,0.1>Gain/pad
 
 in_pin:Track1-L;
 in_pin:Track1-R;
@@ -15,6 +16,7 @@ out_pin:Right;
 gainMax = 10;
 gainMin = -90;
 sliderPos = 0;
+gainpad = 0;
 
 @slider
 slider1 < gainMin ? slider1 = gainMin;
@@ -41,10 +43,11 @@ crossT2 = 2 ^ ( mixPercent/ 6 );
 crossT1 = 2 ^ ( -mixPercent / 6 );
 crossT2 = 1;
 );
+gainpad =  10^(slider4/20);
 
 @sample
 // left mix
-spl0 = ((spl0 * levelT1 * crossT1) + (spl2 * levelT2 * crossT2));
+spl0 = ((spl0 * levelT1 * crossT1) + (spl2 * levelT2 * crossT2))*gainpad;
 
 // right mix
-spl1 = ((spl1 * levelT1 * crossT1) + (spl3 * levelT2 * crossT2)); 
+spl1 = ((spl1 * levelT1 * crossT1) + (spl3 * levelT2 * crossT2))*gainpad; 

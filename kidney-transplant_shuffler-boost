@@ -14,12 +14,15 @@ slider8:0<-18,0,0.5>MF+HF Image narrowing (diff-High-shelf) (dB)
 slider9:0<-30,18,0.5>Output pad (dB)
 
 @init
-bpos=0;
+itm1=itm2=otm1=otm2=0;
+//bpos=0;
 //reverse roximity compensating bass boost
 RBB.eq(slider2,1,slider1,1);
 LBB.eq(slider2,1,slider1,1);
 //Bass shuffle
 SBS.eq(slider3,1,slider4,1);
+//Bass shuffle sum compensator
+BC.eq(slider3*-0.5,1,slider4,1);
 //Squeek-notch
 LSN.eq(slider6,slider7,slider5,0);
 RSN.eq(slider6,slider7,slider5,0);
@@ -29,16 +32,19 @@ amp = 1;
 
 
 @slider
-something=slider1*srate;
+//something=slider1*srate;
 
 //reverse proximity compensating bass boost
 RBB.eq_set_freq(slider2);
 LBB.eq_set_freq(slider2);
 RBB.eq_set_boost(slider1);
 LBB.eq_set_boost(slider1);
-//Bass shuffle
+//Bass shuffle-
 SBS.eq_set_freq(slider4);
 SBS.eq_set_boost(slider3);
+//Compensation-
+BC.eq_set_freq(slider4);
+BC.eq_set_boost(slider3*-0.5);
 //Squeek-notch
 LSN.eq_set_freq(slider6);
 RSN.eq_set_freq(slider6);
@@ -52,8 +58,8 @@ IN.eq_set_boost(slider8);
 
 amp = dbtoa(slider9);
 
-@block
-blah+=samplesblock;
+//@block
+//blah+=samplesblock;
 
 @sample
 
@@ -65,10 +71,12 @@ slider1 != 0 ? (
 slider3 != 0 || slider8 != 0 ? (
  mid = (spl0+spl1)*0.5;
  side = (spl0-spl1)*0.5;
- side = SBS.eq_do(side);
+ side = SBS.eq_do(side); mid = BC.eq_do(mid);
  side = IN.eq_do(side);
- spl0 = mid+side;
- spl1 = mid-side;
+ spl0 = (mid+side);
+ spl1 = (mid-side);
+ spl2 = mid;
+ spl3 = side;
  );
  
 slider5 != 0 ? (
@@ -78,4 +86,7 @@ slider5 != 0 ? (
 
 spl0*=amp;
 spl1*=amp;
+
+otm1=0.999*otm1 + spl0 - itm1; itm1=spl0; spl0=otm1;
+otm2=0.999*otm2 + spl1 - itm2; itm2=spl1; spl1=otm2;
 

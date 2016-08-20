@@ -10,9 +10,9 @@ in_pin:Spot
 out_pin:Left
 out_pin:Right
 
-slider1:-1.6<-90,10,1>Stereo-LR
-slider2:-1.6<-90,10,1>Center
-slider3:-90<-90,10,1>Spot
+slider1:-1.6<-90,10,0.2>Stereo-LR
+slider2:-1.6<-90,10,0.2>Center
+slider3:-90<-90,32,0.2>Spot
 slider4:0<-12,12,0.1>Crossfade: L,R <-|-> Center
 slider5:0<0,2,1{off,6dB/oct,12dB/oct>Spot Low-cut
 slider6:120<40,300,1>Spot LC frequency (Hz)
