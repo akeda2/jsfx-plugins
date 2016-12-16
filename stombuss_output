@@ -1,0 +1,154 @@
+desc:Stombuss modular 2ch output amplifier with "authentic" vintage warm analog transformer saturation and valve magic
+//tags: summing mixer saturation clipping authentic analog vintage magic expensive
+//author: Akeda
+
+import cookdsp.jsfx-inc
+
+slider6:-24<-60,18,0.5>Pre/de-emphasis curve(dB, neg or pos)
+slider7:2500<1000,7000,1>Pre/de-emphasis center frequency (Hz)
+slider8:1<1,1.7,0.01>Pre/de-emphasis center mismatch (bass boost) (Hz)
+
+slider30:0<-60,20,0.1>MASTER output stage gain/pad (dB)
+slider35:0<0,24,0.1>Output stage crosstalk/bleed (dB)
+
+slider45:3<0,32,0.1>Output-amp drive (dB)
+slider46:-3<-6,0,0.1>Output-amp Soft clipping ceiling (dB)
+
+slider48:80<1,100,1>Output (2ch)saturation (%)
+slider49:12000<1000,18000>12dB/oct Lowpass freq(Hz)
+slider50:0<-12,6,0.1>Output trim(2ch) gain/pad (dB)
+
+slider64:0<-12,0,0.1>Hard limiter/clip (dB)
+
+in_pin:left input
+in_pin:right input
+
+out_pin:left output
+out_pin:right output
+
+@init
+bpos=0;
+gainMin = -60;
+gainMax = 30;
+itm1=itm2=otm1=otm2=0;
+
+//Low-pass
+Llp.butlp(slider49);
+Rlp.butlp(slider49);
+
+
+//Pre-emphasis
+peL.eq(slider7,0.1,slider6,0);
+peR.eq(slider7,0.1,slider6,0);
+
+//De-emphasis
+deL.eq((slider7*slider8),0.1,-slider6,0);
+deR.eq((slider7*slider8),0.1,-slider6,0);
+
+
+//Soft clipper
+nominal = 0.5;
+function tanh(x) (exp(x)-exp(-x)) / (exp(x)+exp(-x));
+
+@slider
+something=slider1*srate;
+
+mv=2 ^ (slider64/6);
+
+//Pre-emphasis
+peL.eq_set_freq(slider7*slider8);
+peR.eq_set_freq(slider7*slider8);
+
+peL.eq_set_boost(slider6);
+peR.eq_set_boost(slider6);
+
+//De-emphasis
+deL.eq_set_freq(slider7);
+deR.eq_set_freq(slider7);
+
+deL.eq_set_boost(-slider6);
+deR.eq_set_boost(-slider6);
+
+
+//Output-amp Soft clipper
+o_gain = 2^(slider45/6) * nominal;
+o_ceiling = 10^(slider46/20);
+// Scalar to get output of tanh(x) to -1..1 bounds regardless of the gain:
+o_invGain = 1/(tanh(o_gain));
+
+
+slider30 = min(max(slider30, gainMin), gainMax);
+L_Mlevel = 2 ^ (slider30 / 6);
+R_Mlevel = 2 ^ (slider30 / 6);
+
+//Crosstalk
+crosstalk = 2 ^ (-slider35 / 6);
+
+slider50 = min(max(slider50, gainMin), gainMax);
+L_level = 2 ^ (slider50 / 6);
+R_level = 2 ^ (slider50 / 6);
+
+//Saturation
+//Output
+foo2 = slider48/200*$pi;
+bar2 = sin(slider48/200*$pi);
+
+//Lowpass
+Llp.butlp_set_freq(slider49);
+Rlp.butlp_set_freq(slider49);
+
+@block
+blah+=samplesblock;
+
+@sample
+
+//Master level
+spl0 = (spl0 * L_Mlevel);
+spl1 = (spl1 * R_Mlevel);
+
+//Crosstalk
+slider35 != 0 ? (
+sum = (spl0+spl1)*0.5;
+diff = (spl0-spl1)*0.5;
+spl0 = sum+(diff*crosstalk);
+spl1 = sum-(diff*crosstalk);
+);
+
+//Output-amp soft clipping
+spl0=tanh(spl0*o_gain)*o_invGain;
+spl1=tanh(spl1*o_gain)*o_invGain;
+spl0=max(min(spl0,1),-1);
+spl1=max(min(spl1,1),-1);
+spl0*=o_ceiling;
+spl1*=o_ceiling;
+
+//Output saturation
+slider6 != 0 ? (
+ spl0 = peL.eq_do(spl0);
+ spl1 = peR.eq_do(spl1);
+ );
+ 
+slider48 ? (
+spl0 = min(max( sin(max(min(spl0,1),-1)*foo2)/bar2 ,-1) ,1);
+spl1 = min(max( sin(max(min(spl1,1),-1)*foo2)/bar2 ,-1) ,1);
+);
+
+slider6 != 0 ? (
+ spl0 = deL.eq_do(spl0);
+ spl1 = deR.eq_do(spl1);
+ );
+
+//Lowpass
+spl0 = Llp.butlp_do(spl0);
+spl1 = Rlp.butlp_do(spl1);
+
+//Output level
+spl0 = (spl0 * L_level);
+spl1 = (spl1 * R_level);
+
+//Hard limiter
+spl0=min(max(spl0,-mv),mv);
+spl1=min(max(spl1,-mv),mv);
+
+otm1=0.999*otm1 + spl0 - itm1; itm1=spl0; spl0=otm1;
+otm2=0.999*otm2 + spl1 - itm2; itm2=spl1; spl1=otm2;
