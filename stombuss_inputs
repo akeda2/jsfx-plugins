@@ -1,4 +1,4 @@
-desc:Stombuss modular 8/16ch Input amplifier with "authentic" vintage warm analog transformer saturation and valve magic
+desc:Stombuss 1 modular 8/16ch Input amplifier with "authentic" vintage warm analog transformer saturation and valve magic
 //tags: summing mixer saturation clipping authentic analog vintage magic expensive
 //author: Akeda
 
@@ -12,7 +12,7 @@ slider10:80<1,100,1>Input(16ch) saturation (%)
 slider15:18<0,32,0.1>Global(16ch) input-amps drive (dB)
 slider16:-6<-12,0,0.1>Input-amps Soft clipping ceiling (dB)
 
-slider21:0<-60,6,0.1>Mixer level (dB) 1/2
+slider21:0<-60,6,0.1>Gain (dB) 1/2
 slider22:0<-60,6,0.1>3/4
 slider23:0<-60,6,0.1>5/6
 slider24:0<-60,6,0.1>7/8
@@ -196,10 +196,6 @@ levelF = 2 ^ (slider26 / 6);
 levelG = 2 ^ (slider27 / 6);
 levelH = 2 ^ (slider28 / 6);
 
-slider30 = min(max(slider30, gainMin), gainMax);
-L_Mlevel = 2 ^ (slider30 / 6);
-R_Mlevel = 2 ^ (slider30 / 6);
-
 
 //Saturation
 //Input
@@ -209,7 +205,26 @@ bar = sin(slider10/200*$pi);
 @block
 
 @sample
+//Input gain
+spl0*=levelA;
+spl1*=levelA;
+spl2*=levelB;
+spl3*=levelB;
+spl4*=levelC;
+spl5*=levelC;
+spl6*=levelD;
+spl7*=levelD;
+spl8*=levelE;
+spl9*=levelE;
+spl10*=levelF;
+spl11*=levelF;
+spl12*=levelG;
+spl13*=levelG;
+spl14*=levelH;
+spl15*=levelH;
 
+
+//Pre-emphasis
 slider6 != 0 ? (
  spl0 = pe1.eq_do(spl0);
  spl1 = pe2.eq_do(spl1);
