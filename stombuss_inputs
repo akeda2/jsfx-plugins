@@ -1,4 +1,4 @@
-desc:Stombuss 1 modular 8/16ch Input amplifier with "authentic" vintage warm analog transformer saturation and valve magic
+desc:Stombuss 1 modular 8/16ch preamp
 //tags: summing mixer saturation clipping authentic analog vintage magic expensive
 //author: Akeda
 
@@ -8,7 +8,7 @@ slider6:-24<-60,18,0.5>Pre/de-emphasis curve(dB, neg or pos)
 slider7:2500<1000,7000,1>Pre/de-emphasis center frequency (Hz)
 slider8:1<1,1.7,0.01>Pre/de-emphasis center mismatch (bass boost) (Hz)
 
-slider10:80<1,100,1>Input(16ch) saturation (%)
+slider10:80<0,100,1>Input(16ch) saturation (%)
 slider15:18<0,32,0.1>Global(16ch) input-amps drive (dB)
 slider16:-6<-12,0,0.1>Input-amps Soft clipping ceiling (dB)
 

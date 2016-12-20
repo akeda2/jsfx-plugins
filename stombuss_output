@@ -1,4 +1,4 @@
-desc:Stombuss 3 modular 2ch output amplifier with "authentic" vintage warm analog transformer saturation and valve magic
+desc:Stombuss 3 modular 2ch summing mixer output stage
 //tags: summing mixer saturation clipping authentic analog vintage magic expensive
 //author: Akeda
 
@@ -8,17 +8,17 @@ slider6:-24<-60,18,0.5>Pre/de-emphasis curve(dB, neg or pos)
 slider7:2500<1000,7000,1>Pre/de-emphasis center frequency (Hz)
 slider8:1<1,1.7,0.01>Pre/de-emphasis center mismatch (bass boost) (Hz)
 
-slider30:0<-60,20,0.1>MASTER output stage gain/pad (dB)
+slider30:0<-60,20,0.1>Output stage MASTER gain/pad (dB)
 slider35:0<0,24,0.1>Output stage crosstalk/bleed (dB)
 
 slider45:3<0,32,0.1>Output-amp drive (dB)
 slider46:-3<-6,0,0.1>Output-amp Soft clipping ceiling (dB)
 
-slider48:80<1,100,1>Output (2ch)saturation (%)
-slider49:12000<1000,18000>12dB/oct Lowpass freq(Hz)
+slider48:80<0,100,1>Output (2ch)saturation (%)
+slider49:12000<1000,20000>12dB/oct Lowpass freq(Hz)
 slider50:0<-12,6,0.1>Output trim(2ch) gain/pad (dB)
 
-slider64:0<-12,0,0.1>Hard limiter/clip (dB)
+slider64:0<-12,0,0.1>Hard clip/brickwall limiter (dB)
 
 in_pin:left input
 in_pin:right input
@@ -53,7 +53,7 @@ function tanh(x) (exp(x)-exp(-x)) / (exp(x)+exp(-x));
 @slider
 something=slider1*srate;
 
-mv=2 ^ (slider64/6);
+brickwall = 2 ^ (slider64/6);
 
 //Pre-emphasis
 peL.eq_set_freq(slider7*slider8);
@@ -147,8 +147,8 @@ spl0 = (spl0 * L_level);
 spl1 = (spl1 * R_level);
 
 //Hard limiter
-spl0=min(max(spl0,-mv),mv);
-spl1=min(max(spl1,-mv),mv);
+spl0=min(max(spl0,-brickwall),brickwall);
+spl1=min(max(spl1,-brickwall),brickwall);
 
 otm1=0.999*otm1 + spl0 - itm1; itm1=spl0; spl0=otm1;
 otm2=0.999*otm2 + spl1 - itm2; itm2=spl1; spl1=otm2;
