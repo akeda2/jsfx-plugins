@@ -1,4 +1,4 @@
-desc:Stombuss 2b 6 stereo-ch broadcast mixer with crossfade
+desc:Stombuss 2b 6 stereo-ch broadcast mixer with cascaded crossfading
 
 
 //Vox/microphones 1,2 (spl0,spl11)
@@ -23,9 +23,9 @@ slider63:0<-40,6,0.1>Gain/pad
 @init
 //bpos=0;
 @init
-gainMax = 10;
-gainMin = -90;
-sliderPos = 0;
+//gainMax = 10;
+//gainMin = -90;
+//sliderPos = 0;
 gainpad = 0;
 gain1=gain2=gain3=gain4=gain5=gain6=gain7=gain8=0;
 
@@ -40,9 +40,6 @@ gain6 = 10^(slider6/20);
 //gain8 = 10^(slider8/20);
 
 //Crossfade section:
-slider9 < -40 ? slider9 = -40;
-slider9 > 40 ? slider9 = 40;
-
 slider20 < -40 ? slider20 = -40;
 slider20 > 40 ? slider20 = 40;
 
@@ -51,10 +48,6 @@ slider25 > 40 ? slider25 = 40;
 
 slider30 < -40 ? slider30 = -40;
 slider30 > 40 ? slider30 = 40;
-
-mixPercent = slider9;
-mixPercent == 40 ? mixPercent = 100;
-mixPercent == -40 ? mixPercent = -100;
 
 mixAB = slider20;
 mixAB == 40 ? mixAB = 100;
@@ -68,21 +61,11 @@ mixABCV = slider30;
 mixABCV == 40 ? mixABCV = 100;
 mixABCV == -40 ? mixABCV = -100;
 
-slider9 <= 0 ?
-(
-crossT1 = 1;
-crossT2 = 2 ^ ( mixPercent/ 6 );
-) :
-(
-crossT1 = 2 ^ ( -mixPercent / 6 );
-crossT2 = 1;
-);
-gainpad =  10^(slider10/20);
-
 slider20 <= 0 ? ( crAB_T1 = 1; crAB_T2 = 2 ^ ( mixAB/ 6 );) : ( crAB_T1 = 2 ^ ( -mixAB / 6 ); crAB_T2 = 1;);
 slider25 <= 0 ? ( crABC_T1 = 1; crABC_T2 = 2 ^ ( mixABC/ 6 );) : ( crABC_T1 = 2 ^ ( -mixABC / 6 ); crABC_T2 = 1;);
 slider30 <= 0 ? ( crABCV_T1 = 1; crABCV_T2 = 2 ^ ( mixABCV/ 6 );) : ( crABCV_T1 = 2 ^ ( -mixABCV / 6 ); crABCV_T2 = 1;);
 
+//Gainpad
 gainpad =  10^(slider10/20);
 
 @block
@@ -96,24 +79,20 @@ AL = spl6*gain4; AR = spl7*gain4; BL = spl8*gain5; BR = spl9*gain5; CL = spl10*g
 //spl2=spl3=
 spl4=spl5=spl6=spl7=spl8=spl9=spl10=spl11=spl12=spl13=spl14=spl15=0;
 
-// left mix
-spl0 = ((spl0 * crossT1) + (spl2 * crossT2))*gainpad;
-
-// right mix
-spl1 = ((spl1 * crossT1) + (spl3 * crossT2))*gainpad; 
 
 //AB
-ABL = (( AL * crAB_T1) + (BL * crAB_T2));
-ABR = (( AR * crAB_T1) + (BR * crAB_T2));
+ABL = ((AL * crAB_T1) + (BL * crAB_T2));
+ABR = ((AR * crAB_T1) + (BR * crAB_T2));
 //ABC
-ABCL = (( ABL * crABC_T1) + (CL * crABC_T2));
-ABCR = (( ABR * crABC_T1) + (CR * crABC_T2));
+ABCL = ((ABL * crABC_T1) + (CL * crABC_T2));
+ABCR = ((ABR * crABC_T1) + (CR * crABC_T2));
 //ABCV
-ABCVL = (( ABCL * crABCV_T1) + (voxL * crABCV_T2))*gainpad;
-ABCVR = (( ABCR * crABCV_T1) + (voxR * crABCV_T2))*gainpad;
+ABCVL = ((ABCL * crABCV_T1) + (voxL * crABCV_T2));
+ABCVR = ((ABCR * crABCV_T1) + (voxR * crABCV_T2));
 
-spl0 = ABCVL;
-spl1 = ABCVR;
+//Final gainpad
+spl0 = ABCVL*gainpad;
+spl1 = ABCVR*gainpad;
 
 
 
