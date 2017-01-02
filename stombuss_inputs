@@ -285,6 +285,7 @@ slider6 != 0 ? (
 );
 
 //Soft clipper
+slider15 != 0 ? (
 spl0=tanh(spl0*gain)*invGain;
 spl1=tanh(spl1*gain)*invGain;
 spl2=tanh(spl2*gain)*invGain;
@@ -301,8 +302,6 @@ spl12=tanh(spl12*gain)*invGain;
 spl13=tanh(spl13*gain)*invGain;
 spl14=tanh(spl14*gain)*invGain;
 spl15=tanh(spl15*gain)*invGain;
-
-
 // Hard limit in case input goes over 0dBFS:
 spl0=max(min(spl0,1),-1);
 spl1=max(min(spl1,1),-1);
@@ -320,6 +319,7 @@ spl12=max(min(spl12,1),-1);
 spl13=max(min(spl13,1),-1);
 spl14=max(min(spl14,1),-1);
 spl15=max(min(spl15,1),-1);
+);
 
 // Bring down to ceiling volume:
 spl0*=ceiling;

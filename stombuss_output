@@ -18,6 +18,7 @@ slider48:80<0,100,1>Output (2ch)saturation (%)
 slider49:12000<1000,20000>12dB/oct Lowpass freq(Hz)
 slider50:0<-12,6,0.1>Output trim(2ch) gain/pad (dB)
 
+slider63:0<0,2,0,1{off,on}>Brickwall on/off
 slider64:0<-12,0,0.1>Hard clip/brickwall limiter (dB)
 
 in_pin:left input
@@ -115,12 +116,14 @@ spl1 = sum-(diff*crosstalk);
 );
 
 //Output-amp soft clipping
+slider45 != 0 ? (
 spl0=tanh(spl0*o_gain)*o_invGain;
 spl1=tanh(spl1*o_gain)*o_invGain;
 spl0=max(min(spl0,1),-1);
 spl1=max(min(spl1,1),-1);
 spl0*=o_ceiling;
 spl1*=o_ceiling;
+);
 
 //Output saturation
 slider6 != 0 ? (
@@ -147,8 +150,10 @@ spl0 = (spl0 * L_level);
 spl1 = (spl1 * R_level);
 
 //Hard limiter
+slider63 != 0 ? (
 spl0=min(max(spl0,-brickwall),brickwall);
 spl1=min(max(spl1,-brickwall),brickwall);
+);
 
 otm1=0.999*otm1 + spl0 - itm1; itm1=spl0; spl0=otm1;
 otm2=0.999*otm2 + spl1 - itm2; itm2=spl1; spl1=otm2;
