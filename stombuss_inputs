@@ -21,6 +21,9 @@ slider26:0<-60,6,0.1>11/12
 slider27:0<-60,6,0.1>13/14
 slider28:0<-60,6,0.1>15/16
 
+slider35:0<0,96,1>Channel bleed >-96dB
+
+
 in_pin:Input 1
 in_pin:Input 2
 in_pin:Input 3
@@ -102,6 +105,17 @@ de16.eq(slider7,0.1,-slider6,0);
 nominal = 0.5;
 function tanh(x) (exp(x)-exp(-x)) / (exp(x)+exp(-x));
 
+function saturate(x)
+(
+  x = min(max( sin(max(min(x,1),-1)*foo)/bar ,-1) ,1);
+);
+function clipper(in)
+(
+    in = tanh(in*gain)*invGain;
+    in = max(min(in,1),-1);
+    in *= ceiling;
+);
+
 @slider
 //Pre-emphasis
 pe1.eq_set_freq(slider7);
@@ -131,6 +145,7 @@ pe7.eq_set_boost(slider6);
 pe8.eq_set_boost(slider6);
 pe9.eq_set_boost(slider6);
 pe10.eq_set_boost(slider6);
+pe11.eq_set_boost(slider6);
 pe12.eq_set_boost(slider6);
 pe13.eq_set_boost(slider6);
 pe14.eq_set_boost(slider6);
@@ -178,6 +193,12 @@ ceiling = 10^(slider16/20);
 // Scalar to get output of tanh(x) to -1..1 bounds regardless of the gain:
 invGain = 1/(tanh(gain));
 
+s=21;
+loop(num_ch/2,
+  slider(s) = min(max(slider(s), gainMin), gainMax);
+  s+=1;
+  );
+/*
 slider21 = min(max(slider21, gainMin), gainMax);
 slider22 = min(max(slider22, gainMin), gainMax);
 slider23 = min(max(slider23, gainMin), gainMax);
@@ -186,6 +207,7 @@ slider25 = min(max(slider25, gainMin), gainMax);
 slider26 = min(max(slider26, gainMin), gainMax);
 slider27 = min(max(slider27, gainMin), gainMax);
 slider28 = min(max(slider28, gainMin), gainMax);
+*/
 
 levelA = 2 ^ (slider21 / 6);
 levelB = 2 ^ (slider22 / 6);
@@ -244,9 +266,34 @@ slider6 != 0 ? (
  spl15 = pe16.eq_do(spl15);
 );
 
+//Bleed level and bleed saturation (same as global)
+slider35 != 0 ? (
+  bleed=0;
+  b=0;
+  loop(num_ch,
+    slider10 != 0 ? (
+    bleed+=(saturate(spl(b))*0.00001);
+      ) : (
+        bleed+=(spl(b))*0.00001;
+        );
+    b+=1;
+  );
+  f=0;
+  loop(num_ch,
+    spl(f)+=bleed*(2^(slider35/6));
+    f+=1;
+  );
+);
+
 //Input saturation
 slider10 ? (
-spl0 = min(max( sin(max(min(spl0,1),-1)*foo)/bar ,-1) ,1);
+  i=0;
+  loop(num_ch,
+    spl(i) = saturate(spl(i));
+    i+=1;
+    );
+);
+/*spl0 = min(max( sin(max(min(spl0,1),-1)*foo)/bar ,-1) ,1);
 spl1 = min(max( sin(max(min(spl1,1),-1)*foo)/bar ,-1) ,1);
 spl2 = min(max( sin(max(min(spl2,1),-1)*foo)/bar ,-1) ,1);
 spl3 = min(max( sin(max(min(spl3,1),-1)*foo)/bar ,-1) ,1);
@@ -262,7 +309,7 @@ spl12 = min(max( sin(max(min(spl12,1),-1)*foo)/bar ,-1) ,1);
 spl13 = min(max( sin(max(min(spl13,1),-1)*foo)/bar ,-1) ,1);
 spl14 = min(max( sin(max(min(spl14,1),-1)*foo)/bar ,-1) ,1);
 spl15 = min(max( sin(max(min(spl15,1),-1)*foo)/bar ,-1) ,1);
-);
+);*/
 
 //De-emphasis
 slider6 != 0 ? (
@@ -275,7 +322,7 @@ slider6 != 0 ? (
  spl6 = de7.eq_do(spl6);
  spl7 = de8.eq_do(spl7);
  spl8 = de9.eq_do(spl8);
- spl9 = de10.eq_do(spl9);
+  spl9 = de10.eq_do(spl9);
  spl10 = de11.eq_do(spl10);
  spl11 = de12.eq_do(spl11);
  spl12 = de13.eq_do(spl12);
@@ -286,6 +333,13 @@ slider6 != 0 ? (
 
 //Soft clipper
 slider15 != 0 ? (
+  a=0;
+  loop(16,
+    spl(a)=clipper(spl(a));
+    a+=1;
+    );
+  );
+/*
 spl0=tanh(spl0*gain)*invGain;
 spl1=tanh(spl1*gain)*invGain;
 spl2=tanh(spl2*gain)*invGain;
@@ -338,4 +392,4 @@ spl12*=ceiling;
 spl13*=ceiling;
 spl14*=ceiling;
 spl15*=ceiling;
-
+*/
