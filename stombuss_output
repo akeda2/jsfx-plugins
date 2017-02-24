@@ -22,8 +22,8 @@ slider48:80<0,100,1>Output (2ch)saturation (%)
 slider49:12000<1000,22000>Post 12dB/oct Lowpass freq(Hz)
 slider50:0<-12,6,0.1>Output trim(2ch) gain/pad (dB)
 
-slider63:0<0,2,0,1{off,on}>Brickwall on/off
-slider64:0<-12,0,0.1>Hard clip/brickwall limiter (dB)
+slider63:1<0,1,1{off,on}>Brickwall on/off
+slider64:-0.7<-12,0,0.1>Hard clip/brickwall limiter (dB)
 
 in_pin:left input
 in_pin:right input
@@ -50,6 +50,10 @@ peR.eq(slider7,0.1,slider6,0);
 //De-emphasis
 deL.eq((slider7*slider8),0.1,-slider6,0);
 deR.eq((slider7*slider8),0.1,-slider6,0);
+
+//High-pass
+Lhp.buthp(50);
+Rhp.buthp(50);
 
 //Soft clipper
 nominal = 0.5;
@@ -269,6 +273,12 @@ slider63 != 0 ? (
   spl0 = min(max(spl0,-brickwall),brickwall);
   spl1 = min(max(spl1,-brickwall),brickwall);
 );
+
+//Post limiter high-pass
+//slider63 != 0 ? (
+Lhp.buthp_do(spl0);
+Rhp.buthp_do(spl1);
+//);
 
 /*
 //Downsample
