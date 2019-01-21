@@ -3,8 +3,8 @@ desc:Stombuss 3 modular 2ch summing mixer output stage
 //author: Akeda
 
 import cookdsp.jsfx-inc
-//import wuff/st-oversampler.jsfx-inc
-import Tale/oversampler.jsfx-inc
+import sault-4xlimiter/st-oversampler.jsfx-inc
+//import Tale/oversampler.jsfx-inc
 
 slider2:1<0,1,1{off,on}>Oversampling
 slider5:20000<12000,21000,1>Pre 24dB/oct Lowpass freq(Hz)
